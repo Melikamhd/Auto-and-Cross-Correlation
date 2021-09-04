@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Auto_and_Cross_Correlation</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-08-27"><meta name="DC.source" content="Auto_and_Cross_Correlation.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Corelation</a></li><li><a href="#2">Auto-Corelation</a></li><li><a href="#3">Cross-Corelation</a></li></ul></div><h2>Corelation<a name="1"></a></h2><pre class="codeinput">clc
+clear
+Data = load(<span class="string">'4.txt'</span>)*1e5;
+
+sig = std(Data);
+mm = mean(Data);
+N = length(Data);
+sigma_0 = std(Data);
+</pre><h2>Auto-Corelation<a name="2"></a></h2><p><img src="Auto_and_Cross_Correlation_files/Auto_and_Cross_Correlation_eq12589982705365188335.png" alt="$$ C_{xx}(\tau)\equiv\langle x(t)x(t+\tau)\rangle = \frac{1}{N}\sum_{n=0}^{N-1}x(n)x(n-\tau)$$"></p><pre class="codeinput"><span class="keyword">for</span> Tau = 1:N
+    d1 = (Data-mm)/sigma_0;
+    d2 = d1(Tau:N);
+    c(Tau) = sum(d1(1:N-Tau+1).*d2)/N;
+<span class="keyword">end</span>
+figure(1);ax = gca;
+
+
+plot((1:N)*0.02,c,<span class="string">'.'</span>)
+hold <span class="string">on</span>
+plot((1:N)*0.02,zeros(N,1),<span class="string">'k'</span>)
+title(<span class="string">'Auto-Corelation'</span>,<span class="string">'fontsize'</span>,18)
+xlabel(<span class="string">'\tau'</span>,<span class="string">'fontsize'</span>,18)
+ylabel(<span class="string">'C_{xx}(\tau)'</span>,<span class="string">'fontsize'</span>,18)
+ax.FontSize = 16;
+ax.LineWidth = 1.5;
+axis([0 40 -0.2 1])
+hold <span class="string">off</span>
+</pre><img vspace="5" hspace="5" src="Auto_and_Cross_Correlation_files/Auto_and_Cross_Correlation_01.png" alt=""> <h2>Cross-Corelation<a name="3"></a></h2><p><img src="Auto_and_Cross_Correlation_files/Auto_and_Cross_Correlation_eq03025648338432091886.png" alt="$$ C_{x\eta}(\tau)\equiv\langle x(t)\eta(t+\tau)\rangle = \frac{1}{N}\sum_{n=0}^{N-1}x(n)\eta(n-\tau)$$"></p><pre class="codeinput">Dif=diff(Data);
+
+<span class="keyword">for</span> Tau = 1:N-1
+    c_xy(Tau) =  cross_correlation(Data, Dif, Tau);
+<span class="keyword">end</span>
+figure(2);ax = gca;
+
+plot((1:length(c_xy))*0.02,c_xy,<span class="string">'.'</span>)
+hold <span class="string">on</span>
+plot((1:N)*0.02,zeros(N,1),<span class="string">'k'</span>)
+title(<span class="string">'Cross-Corelation'</span>,<span class="string">'fontsize'</span>,18)
+xlabel(<span class="string">'\tau'</span>,<span class="string">'fontsize'</span>,18)
+ylabel(<span class="string">'C_{x\eta}(\tau)'</span>,<span class="string">'fontsize'</span>,18)
+ax.FontSize = 16;
+ax.LineWidth = 1.5;
+axis([0 40 -0.2 0.05])
+hold <span class="string">off</span>
+</pre><img vspace="5" hspace="5" src="Auto_and_Cross_Correlation_files/Auto_and_Cross_Correlation_02.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB® R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Corelation
+clc
+clear
+Data = load('4.txt')*1e5;
+
+sig = std(Data);
+mm = mean(Data);
+N = length(Data);
+sigma_0 = std(Data);
+%%      Auto-Corelation
+% 
+% $$ C_{xx}(\tau)\equiv\langle x(t)x(t+\tau)\rangle = \frac{1}{N}\sum_{n=0}^{N-1}x(n)x(n-\tau)$$
+% 
+
+for Tau = 1:N
+    d1 = (Data-mm)/sigma_0;
+    d2 = d1(Tau:N);
+    c(Tau) = sum(d1(1:N-Tau+1).*d2)/N;
+end
+figure(1);ax = gca;
+
+
+plot((1:N)*0.02,c,'.')
+hold on
+plot((1:N)*0.02,zeros(N,1),'k')
+title('Auto-Corelation','fontsize',18)
+xlabel('\tau','fontsize',18)
+ylabel('C_{xx}(\tau)','fontsize',18)
+ax.FontSize = 16;
+ax.LineWidth = 1.5;
+axis([0 40 -0.2 1])
+hold off
+%%        Cross-Corelation
+% 
+% $$ C_{x\eta}(\tau)\equiv\langle x(t)\eta(t+\tau)\rangle = \frac{1}{N}\sum_{n=0}^{N-1}x(n)\eta(n-\tau)$$
+% 
+Dif=diff(Data);
+
+for Tau = 1:N-1
+    c_xy(Tau) =  cross_correlation(Data, Dif, Tau);
+end
+figure(2);ax = gca;
+
+plot((1:length(c_xy))*0.02,c_xy,'.')
+hold on
+plot((1:N)*0.02,zeros(N,1),'k')
+title('Cross-Corelation','fontsize',18)
+xlabel('\tau','fontsize',18)
+ylabel('C_{x\eta}(\tau)','fontsize',18)
+ax.FontSize = 16;
+ax.LineWidth = 1.5;
+axis([0 40 -0.2 0.05])
+hold off
+##### SOURCE END #####
+--></body></html>
